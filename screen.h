@@ -9,8 +9,12 @@
 
 class screen {
 public:
+    screen();
+
     screen(const vector3d& origin_, const vector3d& dir1_, const vector3d& dir2_, const long double& length1_,
            const long double& length2_);
+
+    screen(const screen& obj);
 
     void set_resolution(int axis1, int axis2);
 

@@ -58,7 +58,7 @@ bool quadrilateral::intersect(const ray& ray, vector3d* const point) const {
 }
 
 vector3d quadrilateral::normal(const vector3d& point) const {
-    return cross_product(v00_ - point, v01_ - point);
+    return cross_product(v00_ - point, v01_ - point).normalize();
 }
 
 quadrilateral::quadrilateral(const sf::Color& color, const long double& reflectivity, const vector3d& v00_,

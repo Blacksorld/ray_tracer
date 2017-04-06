@@ -4,31 +4,44 @@
 
 #include "ray_tracer.h"
 
-ray_tracer::ray_tracer(const screen& screen, const vector3d& observer, const std::vector<object*>& objects,
-                       const std::vector<illuminant>& illuminants, const unsigned int& axis1_resolution,
-                       const unsigned int& axis2_resolution)
-        : screen_(screen)
-          , observer_(observer)
-          , objects_(objects)
-          , illuminants_(illuminants)
-          , axis1_resolution_(axis1_resolution)
-          , axis2_resolution_(axis2_resolution)
-          , real_screen_(sf::Points, axis1_resolution * axis2_resolution) {
-    for(std::size_t  i = 0; i < axis1_resolution; ++i)
-        for(std::size_t j = 0; j < axis2_resolution; ++j)
-            real_screen_[i * axis2_resolution + j].position = sf::Vector2f(i, j);
-    screen_.set_resolution(axis1_resolution, axis2_resolution);
-}
+ray_tracer::ray_tracer(const std::vector<object*>& objects,
+                       const std::vector<illuminant>& illuminants)
+          : objects_(objects)
+          , illuminants_(illuminants) { }
 
-void ray_tracer::render() {
-    for(unsigned int step1 = 0; step1 < axis1_resolution_; ++step1)
-        for(unsigned int step2 = 0; step2 < axis2_resolution_; ++step2)
-            real_screen_[step1 * axis2_resolution_ + step2].color =
-                    get_screen_color_(screen_.origin_ + step1 * screen_.dir1_ + step2 * screen_.dir2_);
+void ray_tracer::render(const screen& screen_to_render, const vector3d& observer, unsigned int axis1_resolution,
+                        unsigned int axis2_resolution, unsigned int aa_coef) {
+    screen_ = screen_to_render;
+    observer_ = observer;
+    true_axis1_resolution_ = axis1_resolution;
+    true_axis2_resolution_ = axis2_resolution;
+    render_axis1_resolution_ = axis1_resolution * aa_coef;
+    render_axis2_resolution_ = axis2_resolution * aa_coef;
+
+    screen_.set_resolution(render_axis1_resolution_, render_axis2_resolution_);
+    sf::VertexArray render_screen = sf::VertexArray(sf::Points,
+                                                    render_axis1_resolution_ * render_axis2_resolution_);
+    set_screen_position_(render_screen, render_axis1_resolution_, render_axis2_resolution_);
+
+    std::thread t1(&ray_tracer::sub_render_, this, 0, render_axis1_resolution_ / 2,
+                   0, render_axis2_resolution_ / 2, std::ref(render_screen));
+    std::thread t2(&ray_tracer::sub_render_, this, 0, render_axis1_resolution_ / 2,
+                   render_axis2_resolution_ / 2, render_axis2_resolution_, std::ref(render_screen));
+    std::thread t3(&ray_tracer::sub_render_, this, render_axis1_resolution_ / 2,
+                   render_axis1_resolution_, 0, render_axis2_resolution_ / 2, std::ref(render_screen));
+
+    sub_render_(render_axis1_resolution_ / 2, render_axis1_resolution_,
+                render_axis2_resolution_ / 2, render_axis2_resolution_, render_screen);
+
+    t1.join();
+    t2.join();
+    t3.join();
+
+    anti_aliasing_(render_screen, aa_coef);
 }
 
 void ray_tracer::draw() const {
-    sf::RenderWindow window(sf::VideoMode(axis1_resolution_, axis2_resolution_), "ray_tracer");
+    sf::RenderWindow window(sf::VideoMode(true_axis1_resolution_, true_axis2_resolution_), "ray_tracer");
 
     while (window.isOpen())
     {
@@ -149,4 +162,71 @@ sf::Color ray_tracer::add_(const sf::Color& color1, const sf::Color& color2) con
     result.b = (sf::Uint8)std::min((int)result.b + (int)color2.b, 255);
 
     return result;
+}
+
+void ray_tracer::sub_render_(const unsigned int start1, const unsigned int end1,
+                             const unsigned int start2, const unsigned int end2,
+                             sf::VertexArray& render_screen) {
+    for(unsigned int step1 = start1; step1 < end1; ++step1)
+        for(unsigned int step2 = start2; step2 < end2; ++step2)
+            render_screen[step1 * render_axis2_resolution_ + step2].color =
+                    get_screen_color_(screen_.origin_ + step1 * screen_.dir1_ + step2 * screen_.dir2_);
+}
+
+void ray_tracer::set_screen_position_(sf::VertexArray& render_screen, unsigned int axis1_resolution,
+                                      unsigned int axis2_resolution) {
+    for(std::size_t  i = 0; i < axis1_resolution; ++i)
+        for(std::size_t j = 0; j < axis2_resolution; ++j)
+            render_screen[i * axis2_resolution + j].position = sf::Vector2f(i, j);
+}
+
+void ray_tracer::anti_aliasing_(const sf::VertexArray& screen, unsigned int aa_coef) {
+    if(aa_coef == 1) {
+        real_screen_ = screen;
+        return;
+    }
+    real_screen_ = sf::VertexArray(sf::Points, true_axis1_resolution_ * true_axis2_resolution_);
+    set_screen_position_(real_screen_, true_axis1_resolution_, true_axis2_resolution_);
+
+    std::thread t1(&ray_tracer::sub_antialiasing_, this, screen, aa_coef,
+                   0, true_axis1_resolution_ / 2,
+                   0, true_axis2_resolution_ / 2);
+    std::thread t2(&ray_tracer::sub_antialiasing_, this, screen, aa_coef,
+                   0, true_axis1_resolution_ / 2,
+                   true_axis2_resolution_ / 2, true_axis2_resolution_);
+    std::thread t3(&ray_tracer::sub_antialiasing_, this, screen, aa_coef,
+                   true_axis1_resolution_ / 2, true_axis1_resolution_,
+                   0, true_axis2_resolution_ / 2);
+
+    sub_antialiasing_(screen, aa_coef, true_axis1_resolution_ / 2, true_axis1_resolution_,
+                      true_axis2_resolution_ / 2, true_axis2_resolution_);
+
+    t1.join();
+    t2.join();
+    t3.join();
+}
+
+void ray_tracer::sub_antialiasing_(const sf::VertexArray& screen, unsigned int aa_coef, const unsigned int start1,
+                                   const unsigned end1, const unsigned int start2, const unsigned end2) {
+    for(unsigned int step1 = start1; step1 < end1; ++step1)
+        for(unsigned int step2 = start2; step2 < end2; ++step2)
+            real_screen_[step1 * true_axis2_resolution_ + step2].color =
+                    get_pixel_color_(screen, aa_coef, step1, step2);
+
+}
+
+sf::Color ray_tracer::get_pixel_color_(const sf::VertexArray& screen, unsigned int aa_coef, const unsigned int x,
+                                       const unsigned int y) const {
+    int r = 0;
+    int g = 0;
+    int b = 0;
+    for(unsigned int i = x * aa_coef; i < (x + 1) * aa_coef; ++i)
+        for(unsigned int j = y * aa_coef; j < (y + 1) * aa_coef; ++j){
+            r += screen[i * render_axis2_resolution_ + j].color.r;
+            g += screen[i * render_axis2_resolution_ + j].color.g;
+            b += screen[i * render_axis2_resolution_ + j].color.b;
+        }
+    return sf::Color((sf::Uint8)(r / aa_coef / aa_coef),
+                     (sf::Uint8)(g /aa_coef / aa_coef) ,
+                     (sf::Uint8)(b / aa_coef / aa_coef));
 }

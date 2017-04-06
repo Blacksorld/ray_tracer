@@ -9,25 +9,28 @@
 #include "object.h"
 #include "illuminant.h"
 #include <vector>
+#include <thread>
 
 class ray_tracer {
 public:
-    ray_tracer(const screen& screen, const vector3d& observer, const std::vector<object*>& objects,
-                   const std::vector<illuminant>& illuminants, const unsigned int& axis1_resolution,
-                   const unsigned int& axis2_resolution);
+    ray_tracer(const std::vector<object*>& objects, const std::vector<illuminant>& illuminants);
 
-    void render();
+    void render(const screen& screen_to_render, const vector3d& observer, unsigned int axis1_resolution,
+                    unsigned int axis2_resolution, unsigned int aa_coef);
 
     void draw() const;
 
 private:
     screen screen_;
     vector3d observer_;
+    unsigned int render_axis1_resolution_;
+    unsigned int render_axis2_resolution_;
+    unsigned int true_axis1_resolution_;
+    unsigned int true_axis2_resolution_;
+    sf::VertexArray real_screen_;
+
     std::vector<object*> objects_;
     std::vector<illuminant> illuminants_;
-    unsigned int axis1_resolution_;
-    unsigned int axis2_resolution_;
-    sf::VertexArray real_screen_;
 
     object* tracey_(class ray ray, vector3d* const point) const;
     sf::Color get_screen_color_(const vector3d& screen_point) const;
@@ -43,4 +46,20 @@ private:
 
     sf::Color prod_(const sf::Color& color, long double x) const;
     sf::Color add_(const sf::Color& color1, const sf::Color& color2) const;
+
+    void sub_render_(const unsigned int start1, const unsigned int end1,
+                     const unsigned int start2, const unsigned int end2,
+                         sf::VertexArray& render_screen);
+
+    void set_screen_position_(sf::VertexArray& render_screen, unsigned int axis1_resolution,
+                                  unsigned int axis2_resolution);
+
+    void anti_aliasing_(const sf::VertexArray& screen, unsigned int aa_coef);
+
+    void sub_antialiasing_(const sf::VertexArray& screen, unsigned int aa_coef,
+                           const unsigned int start1, const unsigned end1,
+                           const unsigned int start2, const unsigned end2);
+
+    sf::Color get_pixel_color_(const sf::VertexArray& screen, unsigned int aa_coef,
+                          const unsigned int x, const unsigned int y) const;
 };

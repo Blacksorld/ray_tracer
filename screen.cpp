@@ -16,3 +16,13 @@ void screen::set_resolution(int axis1, int axis2) {
     dir1_ *= (length1_ / axis1 / dir1_.module());
     dir2_ *= (length2_ / axis2 / dir2_.module());
 }
+
+screen::screen(const screen& obj)
+    : origin_(obj.origin_)
+    , dir1_(obj.dir1_)
+    , dir2_(obj.dir2_)
+    , length1_(obj.length1_)
+    ,length2_(obj.length2_)
+{}
+
+screen::screen() {}

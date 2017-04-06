@@ -20,9 +20,9 @@ void draw1() {
     il.push_back(illuminant(vector3d(-10, 0, 0), 150));
 
 
-    ray_tracer tracer(screen1, observer, objects, il, 800, 800);
+    ray_tracer tracer(objects, il);
 
-    tracer.render();
+    tracer.render(screen1, observer, 800, 800, 8);
     tracer.draw();
 
     delete objects[0];
@@ -45,9 +45,9 @@ void draw2() {
     il.push_back(illuminant(vector3d(-10, 0, 0), 350));
 
 
-    ray_tracer tracer(screen1, observer, objects, il, 800, 800);
+    ray_tracer tracer( objects, il);
 
-    tracer.render();
+    tracer.render(screen1, observer, 800, 800, 1);
     tracer.draw();
 
     delete objects[0];
@@ -56,6 +56,6 @@ void draw2() {
 
 int main()
 {
-    draw2();
+    draw1();
     return 0;
 }

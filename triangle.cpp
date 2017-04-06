@@ -36,7 +36,7 @@ bool triangle::intersect(const ray& ray, vector3d* const point) const {
 }
 
 vector3d triangle::normal(const vector3d& point) const {
-    return cross_product(v0_ - point, v1_ - point);
+    return cross_product(v0_ - point, v1_ - point).normalize();
 }
 
 triangle::triangle(const sf::Color& color, const long double& reflectivity, const vector3d& v0_, const vector3d& v1_,
