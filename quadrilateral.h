@@ -10,7 +10,7 @@
 
 class quadrilateral : public object{
 public:
-    quadrilateral(const sf::Color& color, const long double& reflectivity, const vector3d& v00_, const vector3d& v01_,
+    quadrilateral(const sf::Color& color, const double& reflectivity, const vector3d& v00_, const vector3d& v01_,
                   const vector3d& v11_, const vector3d& v10_);
 
     bool intersect(const ray& ray, vector3d* const point) const override;

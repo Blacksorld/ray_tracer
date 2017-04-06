@@ -4,8 +4,8 @@
 
 #include "screen.h"
 
-screen::screen(const vector3d& origin_, const vector3d& dir1_, const vector3d& dir2_, const long double& length1_,
-               const long double& length2_)
+screen::screen(const vector3d& origin_, const vector3d& dir1_, const vector3d& dir2_, const double& length1_,
+               const double& length2_)
         : origin_(origin_)
           , dir1_(dir1_)
           , dir2_(dir2_)

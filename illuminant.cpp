@@ -5,22 +5,22 @@
 #include "illuminant.h"
 #include <iostream>
 
-illuminant::illuminant(const vector3d& origin_, const long double& intensity_)
+illuminant::illuminant(const vector3d& origin_, const double& intensity_)
         : origin_(origin_)
           , intensity_(intensity_) {}
 
-long double
+double
 illuminant::get_point_intensity(const vector3d& point, const vector3d& normal,
                                 const std::vector<object*>& objects) const {
     vector3d direction = point - origin_;
-    long double dist2 = scalar_product(direction, direction);
-    long double cosinus = cos(-direction, normal);
+    double dist2 = scalar_product(direction, direction);
+    double cosinus = cos(-direction, normal);
     if(cosinus < 0)
         return 0;
-    long double result = intensity_ * cosinus / dist2;
+    double result = intensity_ * cosinus / dist2;
 
     ray illuminant_ray(origin_, direction);
-    long double point_dist = (point - origin_).module();
+    double point_dist = (point - origin_).module();
     for(auto object : objects) {
         vector3d intersection_point;
         bool is_intersection = object->intersect(illuminant_ray, &intersection_point);

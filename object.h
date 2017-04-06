@@ -10,7 +10,7 @@
 
 class object {
 public:
-    object(const sf::Color& color, const long double& reflectivity);
+    object(const sf::Color& color, const double& reflectivity);
 
     virtual ~object();
 
@@ -20,11 +20,11 @@ public:
 
     const sf::Color& get_color() const;
 
-    long double getReflectivity() const;
+    double getReflectivity() const;
 
 protected:
     sf::Color color_;
-    long double reflectivity_;
+    double reflectivity_;
 };
 
 

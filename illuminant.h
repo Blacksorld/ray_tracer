@@ -11,13 +11,13 @@
 
 class illuminant {
 public:
-    illuminant(const vector3d& origin_, const long double& intensity_);
+    illuminant(const vector3d& origin_, const double& intensity_);
 
-    long double get_point_intensity(const vector3d& point, const vector3d& normal,
+    double get_point_intensity(const vector3d& point, const vector3d& normal,
                                     const std::vector<object*>& objects) const;
 private:
     vector3d origin_;
-    long double intensity_;
+    double intensity_;
 };
 
 

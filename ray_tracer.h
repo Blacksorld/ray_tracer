@@ -36,7 +36,7 @@ private:
 
     object* tracey_(class ray ray, vector3d* const point) const;
     sf::Color get_screen_color_(const vector3d& screen_point) const;
-    long double get_point_intensity_(const vector3d& point, const object* point_object, const vector3d& dir) const;
+    double get_point_intensity_(const vector3d& point, const object* point_object, const vector3d& dir) const;
 
     sf::Color get_object_point_color_(const vector3d& base_point, const object* const base_object,
                                       const vector3d& direction) const;
@@ -44,9 +44,9 @@ private:
                                   const vector3d& direction,
                                   vector3d* const reflection_point) const;
     sf::Color calculate_reflection_dist_(const sf::Color& base_color,
-                                         const sf::Color& reflection_color, long double reflectivity) const;
+                                         const sf::Color& reflection_color, double reflectivity) const;
 
-    sf::Color prod_(const sf::Color& color, long double x) const;
+    sf::Color prod_(const sf::Color& color, double x) const;
     sf::Color add_(const sf::Color& color1, const sf::Color& color2) const;
 
     void sub_render_(sf::VertexArray& render_screen);

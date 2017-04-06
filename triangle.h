@@ -9,7 +9,7 @@
 
 class triangle : public object{
 public:
-    triangle(const sf::Color& color, const long double& reflectivity, const vector3d& v0_, const vector3d& v1_,
+    triangle(const sf::Color& color, const double& reflectivity, const vector3d& v0_, const vector3d& v1_,
              const vector3d& v2_);
 
     bool intersect(const ray& ray, vector3d* const point) const override;

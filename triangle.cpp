@@ -10,24 +10,24 @@ bool triangle::intersect(const ray& ray, vector3d* const point) const {
     vector3d e1 = v1_ - v0_;
     vector3d e2 = v2_ - v0_;
     vector3d P = cross_product(ray.direction_, e2);
-    long double det = scalar_product(e1, P);
+    double det = scalar_product(e1, P);
 
     if(std::abs(det) < 1e-9)
         return false;
 
     vector3d T = ray.origin_ - v0_;
 
-    long double u = scalar_product(T, P) / det;
+    double u = scalar_product(T, P) / det;
     if(u < 0 || u > 1)
         return false;
 
     vector3d Q = cross_product(T, e1);
-    long double v = scalar_product(ray.direction_, Q) / det;
+    double v = scalar_product(ray.direction_, Q) / det;
 
     if(v < 0 || u + v > 1)
         return false;
 
-    long double t = scalar_product(e2, Q) / det;
+    double t = scalar_product(e2, Q) / det;
 
     if (t < 1e-9)
         return false;
@@ -39,6 +39,6 @@ vector3d triangle::normal(const vector3d& point) const {
     return cross_product(v0_ - point, v1_ - point).normalize();
 }
 
-triangle::triangle(const sf::Color& color, const long double& reflectivity, const vector3d& v0_, const vector3d& v1_,
+triangle::triangle(const sf::Color& color, const double& reflectivity, const vector3d& v0_, const vector3d& v1_,
                    const vector3d& v2_)
         : object(color, reflectivity), v0_(v0_), v1_(v1_), v2_(v2_) {}

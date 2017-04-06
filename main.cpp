@@ -2,6 +2,7 @@
 #include "sphere.h"
 #include "triangle.h"
 #include "quadrilateral.h"
+#include <iostream>
 
 void draw1() {
     vector3d observer(0, 0, 0);
@@ -22,7 +23,7 @@ void draw1() {
 
     ray_tracer tracer(objects, il);
 
-    tracer.render(screen1, observer, 800, 800, 8);
+    tracer.render(screen1, observer, 800, 800, 16);
     tracer.draw();
 
     delete objects[0];

@@ -11,8 +11,8 @@ class screen {
 public:
     screen();
 
-    screen(const vector3d& origin_, const vector3d& dir1_, const vector3d& dir2_, const long double& length1_,
-           const long double& length2_);
+    screen(const vector3d& origin_, const vector3d& dir1_, const vector3d& dir2_, const double& length1_,
+           const double& length2_);
 
     screen(const screen& obj);
 
@@ -23,8 +23,8 @@ private:
     vector3d origin_;
     vector3d dir1_;
     vector3d dir2_;
-    long double length1_;
-    long double length2_;
+    double length1_;
+    double length2_;
 };
 
 
