@@ -23,19 +23,16 @@ void ray_tracer::render(const screen& screen_to_render, const vector3d& observer
                                                     render_axis1_resolution_ * render_axis2_resolution_);
     set_screen_position_(render_screen, render_axis1_resolution_, render_axis2_resolution_);
 
-    std::thread t1(&ray_tracer::sub_render_, this, 0, render_axis1_resolution_ / 2,
-                   0, render_axis2_resolution_ / 2, std::ref(render_screen));
-    std::thread t2(&ray_tracer::sub_render_, this, 0, render_axis1_resolution_ / 2,
-                   render_axis2_resolution_ / 2, render_axis2_resolution_, std::ref(render_screen));
-    std::thread t3(&ray_tracer::sub_render_, this, render_axis1_resolution_ / 2,
-                   render_axis1_resolution_, 0, render_axis2_resolution_ / 2, std::ref(render_screen));
+    pixel_number_ = 0;
+    unsigned int n = std::thread::hardware_concurrency();
+    std::vector<std::thread> threads;
+    for(unsigned int i = 0; i < n - 1; ++i)
+        threads.emplace_back(&ray_tracer::sub_render_, this, std::ref(render_screen));
 
-    sub_render_(render_axis1_resolution_ / 2, render_axis1_resolution_,
-                render_axis2_resolution_ / 2, render_axis2_resolution_, render_screen);
+    sub_render_(render_screen);
 
-    t1.join();
-    t2.join();
-    t3.join();
+    for(auto& thread : threads)
+        thread.join();
 
     anti_aliasing_(render_screen, aa_coef);
 }
@@ -164,13 +161,18 @@ sf::Color ray_tracer::add_(const sf::Color& color1, const sf::Color& color2) con
     return result;
 }
 
-void ray_tracer::sub_render_(const unsigned int start1, const unsigned int end1,
-                             const unsigned int start2, const unsigned int end2,
-                             sf::VertexArray& render_screen) {
-    for(unsigned int step1 = start1; step1 < end1; ++step1)
-        for(unsigned int step2 = start2; step2 < end2; ++step2)
-            render_screen[step1 * render_axis2_resolution_ + step2].color =
-                    get_screen_color_(screen_.origin_ + step1 * screen_.dir1_ + step2 * screen_.dir2_);
+void ray_tracer::sub_render_(sf::VertexArray& render_screen) {
+    while(true) {
+        unsigned int pixel = pixel_number_++;
+
+        if(pixel >= render_axis1_resolution_ * render_axis2_resolution_)
+            return;
+
+        unsigned int step1 = pixel / render_axis2_resolution_;
+        unsigned int step2 = pixel % render_axis2_resolution_;
+        render_screen[pixel].color =
+                get_screen_color_(screen_.origin_ + step1 * screen_.dir1_ + step2 * screen_.dir2_);
+    }
 }
 
 void ray_tracer::set_screen_position_(sf::VertexArray& render_screen, unsigned int axis1_resolution,
@@ -188,30 +190,31 @@ void ray_tracer::anti_aliasing_(const sf::VertexArray& screen, unsigned int aa_c
     real_screen_ = sf::VertexArray(sf::Points, true_axis1_resolution_ * true_axis2_resolution_);
     set_screen_position_(real_screen_, true_axis1_resolution_, true_axis2_resolution_);
 
-    std::thread t1(&ray_tracer::sub_antialiasing_, this, screen, aa_coef,
-                   0, true_axis1_resolution_ / 2,
-                   0, true_axis2_resolution_ / 2);
-    std::thread t2(&ray_tracer::sub_antialiasing_, this, screen, aa_coef,
-                   0, true_axis1_resolution_ / 2,
-                   true_axis2_resolution_ / 2, true_axis2_resolution_);
-    std::thread t3(&ray_tracer::sub_antialiasing_, this, screen, aa_coef,
-                   true_axis1_resolution_ / 2, true_axis1_resolution_,
-                   0, true_axis2_resolution_ / 2);
+    pixel_number_ = 0;
+    unsigned int n = std::thread::hardware_concurrency();
+    std::vector<std::thread> threads;
 
-    sub_antialiasing_(screen, aa_coef, true_axis1_resolution_ / 2, true_axis1_resolution_,
-                      true_axis2_resolution_ / 2, true_axis2_resolution_);
+    for(unsigned int i = 0; i < n - 1; ++i)
+        threads.emplace_back(&ray_tracer::sub_antialiasing_, this, screen, aa_coef);
 
-    t1.join();
-    t2.join();
-    t3.join();
+    sub_antialiasing_(screen, aa_coef);
+
+    for(auto& thread : threads)
+        thread.join();
 }
 
-void ray_tracer::sub_antialiasing_(const sf::VertexArray& screen, unsigned int aa_coef, const unsigned int start1,
-                                   const unsigned end1, const unsigned int start2, const unsigned end2) {
-    for(unsigned int step1 = start1; step1 < end1; ++step1)
-        for(unsigned int step2 = start2; step2 < end2; ++step2)
-            real_screen_[step1 * true_axis2_resolution_ + step2].color =
-                    get_pixel_color_(screen, aa_coef, step1, step2);
+void ray_tracer::sub_antialiasing_(const sf::VertexArray& screen, unsigned int aa_coef) {
+    while(true) {
+        unsigned int pixel = pixel_number_++;
+
+        if(pixel >= true_axis1_resolution_ * true_axis2_resolution_)
+            return;
+
+        unsigned int step1 = pixel / true_axis2_resolution_;
+        unsigned int step2 = pixel % true_axis2_resolution_;
+        real_screen_[pixel].color =
+                get_pixel_color_(screen, aa_coef, step1, step2);
+    }
 
 }
 

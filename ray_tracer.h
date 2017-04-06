@@ -10,6 +10,7 @@
 #include "illuminant.h"
 #include <vector>
 #include <thread>
+#include <atomic>
 
 class ray_tracer {
 public:
@@ -28,6 +29,7 @@ private:
     unsigned int true_axis1_resolution_;
     unsigned int true_axis2_resolution_;
     sf::VertexArray real_screen_;
+    std::atomic<unsigned int> pixel_number_;
 
     std::vector<object*> objects_;
     std::vector<illuminant> illuminants_;
@@ -47,18 +49,14 @@ private:
     sf::Color prod_(const sf::Color& color, long double x) const;
     sf::Color add_(const sf::Color& color1, const sf::Color& color2) const;
 
-    void sub_render_(const unsigned int start1, const unsigned int end1,
-                     const unsigned int start2, const unsigned int end2,
-                         sf::VertexArray& render_screen);
+    void sub_render_(sf::VertexArray& render_screen);
 
     void set_screen_position_(sf::VertexArray& render_screen, unsigned int axis1_resolution,
                                   unsigned int axis2_resolution);
 
     void anti_aliasing_(const sf::VertexArray& screen, unsigned int aa_coef);
 
-    void sub_antialiasing_(const sf::VertexArray& screen, unsigned int aa_coef,
-                           const unsigned int start1, const unsigned end1,
-                           const unsigned int start2, const unsigned end2);
+    void sub_antialiasing_(const sf::VertexArray& screen, unsigned int aa_coef);
 
     sf::Color get_pixel_color_(const sf::VertexArray& screen, unsigned int aa_coef,
                           const unsigned int x, const unsigned int y) const;
