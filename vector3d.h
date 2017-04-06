@@ -40,6 +40,8 @@ public:
 
     long double module() const;
 
+    vector3d projection(const vector3d& vec) const;
+
 private:
     long double x_;
     long double y_;

@@ -12,6 +12,7 @@ public:
 
     ray(const ray& obj);
 
+    friend class ray_tracer;
     friend class object;
     friend class sphere;
     friend class triangle;

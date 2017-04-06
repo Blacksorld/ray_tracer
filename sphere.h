@@ -9,7 +9,7 @@
 
 class sphere : public object {
 public:
-    sphere(const sf::Color& color, const vector3d& center, const long double radius);
+    sphere(const sf::Color& color, const long double& reflectivity, const vector3d& center_, long double radius_);
 
     bool intersect(const ray& ray, vector3d* const point) const override;
 

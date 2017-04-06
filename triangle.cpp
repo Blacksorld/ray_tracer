@@ -4,11 +4,7 @@
 
 #include "triangle.h"
 
-triangle::triangle(const sf::Color& color, const vector3d& v0_, const vector3d& v1_, const vector3d& v2_)
-        : object(color)
-          , v0_(v0_)
-          , v1_(v1_)
-          , v2_(v2_) {}
+
 
 bool triangle::intersect(const ray& ray, vector3d* const point) const {
     vector3d e1 = v1_ - v0_;
@@ -33,7 +29,7 @@ bool triangle::intersect(const ray& ray, vector3d* const point) const {
 
     long double t = scalar_product(e2, Q) / det;
 
-    if (t < 0)
+    if (t < 1e-9)
         return false;
     *point = ray.origin_ + t * ray.direction_;
     return true;
@@ -42,3 +38,7 @@ bool triangle::intersect(const ray& ray, vector3d* const point) const {
 vector3d triangle::normal(const vector3d& point) const {
     return cross_product(v0_ - point, v1_ - point);
 }
+
+triangle::triangle(const sf::Color& color, const long double& reflectivity, const vector3d& v0_, const vector3d& v1_,
+                   const vector3d& v2_)
+        : object(color, reflectivity), v0_(v0_), v1_(v1_), v2_(v2_) {}

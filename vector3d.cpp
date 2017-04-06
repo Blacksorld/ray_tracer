@@ -72,3 +72,7 @@ long double vector3d::module() const {
 }
 
 vector3d::vector3d() {}
+
+vector3d vector3d::projection(const vector3d& vec) const {
+    return scalar_product(*this, vec.normalize()) * vec;
+}
