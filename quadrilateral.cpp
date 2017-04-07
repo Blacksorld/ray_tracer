@@ -61,9 +61,9 @@ vector3d quadrilateral::normal(const vector3d& point) const {
     return normal_;
 }
 
-quadrilateral::quadrilateral(const sf::Color& color, const double& reflectivity, const vector3d& v00_,
-                             const vector3d& v01_, const vector3d& v11_, const vector3d& v10_)
-        : object(color, reflectivity)
+quadrilateral::quadrilateral(const sf::Color& color, double alpha, double reflectivity, const double& refractivity,
+                             const vector3d& v00_, const vector3d& v01_, const vector3d& v11_, const vector3d& v10_)
+        : object(color, alpha, reflectivity, refractivity)
           , v00_(v00_)
           , v01_(v01_)
           , v11_(v11_)

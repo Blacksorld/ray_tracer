@@ -241,7 +241,8 @@ void rt_parser::parse_sphere_() {
 
         if(s == "endsphere") {
             material mat = materials_[material_id];
-            objects_.push_back(new sphere(mat.color, mat.reflect, vector3d(x, y, z), radius));
+            objects_.push_back(new sphere(mat.color, mat.alpha, mat.reflect, mat.refract,
+                                          vector3d(x, y, z), radius));
             break;
         }
 
@@ -273,8 +274,10 @@ void rt_parser::parse_triangle_() {
 
         if(s == "endtriangle") {
             material mat = materials_[material_id];
-            objects_.push_back(new triangle(mat.color, mat.reflect, vector3d(x[0], y[0], z[0]),
-                                            vector3d(x[1], y[1], z[1]), vector3d(x[2], y[2], z[2])));
+            objects_.push_back(
+                    new triangle(mat.color, mat.alpha, mat.reflect, mat.refract,
+                                 vector3d(x[0], y[0], z[0]), vector3d(x[1], y[1], z[1]),
+                                 vector3d(x[2], y[2], z[2])));
             break;
         }
 
@@ -302,8 +305,10 @@ void rt_parser::parse_quadrangle_() {
 
         if(s == "endquadrangle") {
             material mat = materials_[material_id];
-            objects_.push_back(new quadrilateral(mat.color, mat.reflect, vector3d(x[0], y[0], z[0]),
-                                                 vector3d(x[1], y[1], z[1]), vector3d(x[2], y[2], z[2]),
+            objects_.push_back(new quadrilateral(mat.color, mat.alpha, mat.reflect, mat.refract,
+                                                 vector3d(x[0], y[0], z[0]),
+                                                 vector3d(x[1], y[1], z[1]),
+                                                 vector3d(x[2], y[2], z[2]),
                                                  vector3d(x[3], y[3], z[3])));
             break;
         }

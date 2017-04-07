@@ -39,9 +39,9 @@ vector3d triangle::normal(const vector3d& point) const {
     return normal_;
 }
 
-triangle::triangle(const sf::Color& color, const double& reflectivity, const vector3d& v0_, const vector3d& v1_,
-                   const vector3d& v2_)
-        : object(color, reflectivity)
+triangle::triangle(const sf::Color& color, double alpha, const double& reflectivity, double refractivity, const vector3d& v0_,
+                   const vector3d& v1_, const vector3d& v2_)
+        : object(color, alpha, reflectivity, refractivity)
           , v0_(v0_)
           , v1_(v1_)
           , v2_(v2_)

@@ -37,5 +37,6 @@ vector3d sphere::normal(const vector3d& point) const {
     return (point - center_).normalize();
 }
 
-sphere::sphere(const sf::Color& color, const double& reflectivity, const vector3d& center_, double radius_)
-        : object(color, reflectivity), center_(center_), radius_(radius_) {}
+sphere::sphere(const sf::Color& color, double alpha, const double& reflectivity, double refractivity,
+               const vector3d& center_, double radius_)
+        : object(color, alpha, reflectivity, refractivity), center_(center_), radius_(radius_) {}
