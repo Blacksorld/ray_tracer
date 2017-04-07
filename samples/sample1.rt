@@ -1,0 +1,103 @@
+# Описание экрана
+viewport
+	origin 0 0 0		# Положение глаза наблюдателя
+	topleft -10 10 10	# Верхний-левый угол экрана
+	bottomleft -10 10 -10	# Нижний-левый угол экрана
+	topright 10 10 10	# Верхний-правый угол экрана
+endviewport
+
+
+# Описание материалов
+materials
+	entry
+		name blue		# Имя
+		color 0 0 255 	 	# Цвет поверхности
+		alpha 1			# Коэффициент прозрачности (1-непрозрачный)
+		reflect 0		# Коэффициент отражения
+		refract 0		# Коэффициент преломления
+	endentry
+
+	entry
+		name red		# Имя
+		color 255 0 0 	 	# Цвет поверхности
+		alpha 1			# Коэффициент прозрачности (1-непрозрачный)
+		reflect 0		# Коэффициент отражения
+		refract 0		# Коэффициент преломления
+	endentry
+
+	entry
+		name green		# Имя
+		color 0 255 0 	 	# Цвет поверхности
+		alpha 1			# Коэффициент прозрачности (1-непрозрачный)
+		reflect 0		# Коэффициент отражения
+		refract 0		# Коэффициент преломления
+	endentry
+
+	entry
+		name white		# Имя
+		color 255 255 255 	# Цвет поверхности
+		alpha 1			# Коэффициент прозрачности (1-непрозрачный)
+		reflect 0.5		# Коэффициент отражения
+		refract 0		# Коэффициент преломления
+	endentry
+endmaterials
+
+
+# Описание освещения сцены
+lights
+	# Описание нормировочных коэффициентов
+	reference
+		# Мощность эталонного источника
+		power 1
+		# Расстояние от него до эталонной плоскости
+		distance 1
+	endreference
+	# Описание одного источника света
+	point
+		# Координаты
+		coords 5 0 0
+		# Мощность
+		power 150
+	endpoint
+	
+	# Описание одного источника света
+	point
+		# Координаты
+		coords -10 0 0
+		# Мощность
+		power 150
+	endpoint
+	…
+endlights
+
+
+# Описание примитивов
+geometry
+	sphere
+		coords 0 20 0
+		radius 5
+		material blue
+	endsphere
+
+	sphere
+		coords 5 20 0
+		radius 6
+		material red
+	endsphere
+
+	triangle
+		vertex 0 11 0
+		vertex 3 11 0
+		vertex 3 15 4
+		material green
+	endtriangle
+
+	quadrangle
+		vertex -30 -30 -6
+		vertex 60 -30 -6
+		vertex 60 60 -6
+		vertex -30 60 -6
+		material white
+	endquadrangle
+
+endgeometry

@@ -55,8 +55,7 @@ void draw2() {
 int main()
 {
     std::ios_base::sync_with_stdio(false);
-//    draw1();
-    rt_parser parser("sample.rt");
+    rt_parser parser("../samples/sample1.rt");
     parser.parse();
     parser.render();
     return 0;
