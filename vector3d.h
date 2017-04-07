@@ -42,6 +42,12 @@ public:
 
     vector3d projection(const vector3d& vec) const;
 
+
+
+    friend class object;
+    friend class quadrilateral;
+    friend class triangle;
+    friend class sphere;
 private:
     double x_;
     double y_;

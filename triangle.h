@@ -20,6 +20,7 @@ private:
     vector3d v0_;
     vector3d v1_;
     vector3d v2_;
+    vector3d normal_;
 };
 
 

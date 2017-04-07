@@ -10,7 +10,7 @@ const sf::Color& object::get_color() const {
 
 object::object(const sf::Color& color, const double& reflectivity)
         : color_(color)
-        , reflectivity_(reflectivity / 100)
+        , reflectivity_(reflectivity)
 {}
 
 object::~object() {

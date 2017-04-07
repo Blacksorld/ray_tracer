@@ -1,7 +1,4 @@
-#include "ray_tracer.h"
-#include "sphere.h"
-#include "triangle.h"
-#include "quadrilateral.h"
+#include "rt_parser.h"
 #include <iostream>
 
 void draw1() {
@@ -13,7 +10,7 @@ void draw1() {
     objects[0] = new sphere(sf::Color(0, 0, 255), 0, vector3d(0, 20, 0), 5);
     objects[1] = new triangle(sf::Color(0, 255, 0), 0, vector3d(0, 11, 0), vector3d(3, 11, 0), vector3d(3, 15, 4));
     objects[2] = new sphere(sf::Color(255, 0, 0), 0, vector3d(5, 20, 0), 6);
-    objects[3] = new quadrilateral(sf::Color::White, 50, vector3d(-30, -30, -6), vector3d(60, -30, -6),
+    objects[3] = new quadrilateral(sf::Color::White, 0.5, vector3d(-30, -30, -6), vector3d(60, -30, -6),
                                    vector3d(60, 60, -6), vector3d(-30, 60, -6));
 
     std::vector<illuminant> il;
@@ -23,7 +20,7 @@ void draw1() {
 
     ray_tracer tracer(objects, il);
 
-    tracer.render(screen1, observer, 800, 800, 16);
+    tracer.render(screen1, observer, 800, 800, 4);
     tracer.draw();
 
     delete objects[0];
@@ -39,7 +36,7 @@ void draw2() {
 
     std::vector<object*> objects(2);
     objects[0] = new sphere(sf::Color(0, 0, 255), 0, vector3d(0, 20, 0), 5);
-    objects[1] = new quadrilateral(sf::Color::White, 50, vector3d(10, -30, -30), vector3d(10, -30, 30),
+    objects[1] = new quadrilateral(sf::Color::White, 0.5, vector3d(10, -30, -30), vector3d(10, -30, 30),
                                    vector3d(10, 30, 30), vector3d(10, 30, -30));
 
     std::vector<illuminant> il;
@@ -57,6 +54,10 @@ void draw2() {
 
 int main()
 {
-    draw1();
+    std::ios_base::sync_with_stdio(false);
+//    draw1();
+    rt_parser parser("sample.rt");
+    parser.parse();
+    parser.render();
     return 0;
 }

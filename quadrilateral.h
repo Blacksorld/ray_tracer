@@ -22,6 +22,7 @@ private:
     vector3d v01_;
     vector3d v11_;
     vector3d v10_;
+    vector3d normal_;
 };
 
 

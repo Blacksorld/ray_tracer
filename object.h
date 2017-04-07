@@ -7,6 +7,7 @@
 #include "ray.h"
 #include "vector3d.h"
 #include <SFML/Graphics.hpp>
+#include <array>
 
 class object {
 public:
@@ -14,9 +15,9 @@ public:
 
     virtual ~object();
 
-    virtual bool intersect(const ray &ray, vector3d* const point) const = 0;
+    virtual bool intersect(const ray& ray, vector3d* const point) const = 0;
 
-    virtual vector3d normal(const vector3d &point) const = 0;
+    virtual vector3d normal(const vector3d& point) const = 0;
 
     const sf::Color& get_color() const;
 
