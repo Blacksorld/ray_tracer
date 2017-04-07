@@ -55,7 +55,7 @@ void ray_tracer::draw() const {
     }
 }
 
-object* ray_tracer::tracey_(class ray ray, vector3d* const point) const {
+object* ray_tracer::trace_(const ray& ray, vector3d* const point) const {
     double min_distance = 1e18;
     object* intersection_object = nullptr;
 
@@ -75,15 +75,56 @@ object* ray_tracer::tracey_(class ray ray, vector3d* const point) const {
 }
 
 sf::Color ray_tracer::get_screen_color_(const vector3d& screen_point) const {
-    ray screen_ray(screen_point, screen_point - observer_);
+    ray ray(screen_point, screen_point - observer_);
+    return get_color_(ray, 4);
+}
+
+sf::Color ray_tracer::get_color_(const ray& cur_ray, unsigned int depth) const {
     vector3d intersection_point;
-    object* object_ptr = tracey_(screen_ray, &intersection_point);
+    object* object_ptr = trace_(cur_ray, &intersection_point);
+    if (!object_ptr)
+        return sf::Color();
+    auto normal = object_ptr->normal(intersection_point);
 
-    if(object_ptr != nullptr)
-        return get_object_point_color_(intersection_point, object_ptr, observer_ - screen_point);
+    double intensity = get_point_intensity_(intersection_point, object_ptr, cur_ray.origin_ - intersection_point);
+    if (depth == 0) {
+        return prod_(object_ptr->get_color(), intensity);
+    }
+
+    double reflection = object_ptr->getReflectivity();
+    sf::Color mirrored_color;
+    if (reflection > 0) {
+        ray mirrored_ray(cur_ray.mirror(intersection_point, normal));
+        mirrored_color = get_color_(mirrored_ray, depth - 1);
+    }
+
+    sf::Color base = prod_(object_ptr->get_color(), intensity);
+    sf::Color refraction = sf::Color();
+    if (object_ptr->getAlpha() != 1) {
+        double cos_phi = scalar_product(cur_ray.direction_, normal);
+        double k; // outside / inside
+        if (cos_phi < 0) {
+            cos_phi = -cos_phi;
+            k = object_ptr->getRefractiviry();
+        } else {
+            k = 1 / object_ptr->getRefractiviry();
+            normal = -normal;
+        }
+
+        double cos2_psi = 1 - k * k * (1 - cos_phi * cos_phi);
+        if (cos2_psi > 0) {
+            auto refracted = k * cur_ray.direction_ + (cos_phi * k - std::sqrt(cos2_psi)) * normal;
+            ray refracted_ray(intersection_point, refracted);
+            refraction = get_color_(refracted_ray, depth - 1);
+        } else {
+            refraction = mirrored_color;
+        }
+    } else
+        refraction = sf::Color();
 
 
-    return sf::Color();
+    base = calculate_dist_color_(refraction, base, object_ptr->getAlpha());
+    return calculate_dist_color_(base, mirrored_color, reflection);
 }
 
 double
@@ -99,45 +140,8 @@ ray_tracer::get_point_intensity_(const vector3d& point, const object* point_obje
     return intensity;
 }
 
-sf::Color ray_tracer::get_object_point_color_(const vector3d& base_point, const object* const base_object,
-                                              const vector3d& direction) const {
-    double base_intensity = get_point_intensity_(base_point, base_object, direction);
-    double reflection = base_object->getReflectivity();
-    sf::Color base_color = base_object->get_color();
-
-    if(reflection < 1e-9)
-        return prod_(base_color, base_intensity);
-
-    vector3d reflection_point;
-    object* reflection_object = get_reflection_point_(base_point, base_object,
-                                                      direction, &reflection_point);
-
-    if(reflection_object == nullptr)
-        return calculate_reflection_dist_(prod_(base_color, base_intensity),
-                                          sf::Color(),
-                                          base_object->getReflectivity());
-
-    double reflection_intensity = get_point_intensity_(reflection_point, reflection_object,
-                                                            base_point - reflection_point);
-    sf::Color reflection_color = reflection_object->get_color();
-
-    return calculate_reflection_dist_(prod_(base_color, base_intensity),
-                                      prod_(reflection_color, reflection_intensity),
-                                      base_object->getReflectivity());
-}
-
-object* ray_tracer::get_reflection_point_(const vector3d& base_point, const object* const base_object,
-                                          const vector3d& direction,
-                                          vector3d* const reflection_point) const {
-    vector3d normal = base_object->normal(base_point);
-    if(scalar_product(normal, direction) < 0)
-        normal = -normal;
-
-    return tracey_(ray(base_point, 2 * direction.projection(normal) - direction), reflection_point);
-}
-
-sf::Color ray_tracer::calculate_reflection_dist_(const sf::Color& base_color, const sf::Color& reflection_color,
-                                                 double reflectivity) const {
+sf::Color ray_tracer::calculate_dist_color_(const sf::Color& base_color, const sf::Color& reflection_color,
+                                            double reflectivity) const {
     return add_(prod_(base_color, 1 - reflectivity), prod_(reflection_color, reflectivity));
 }
 

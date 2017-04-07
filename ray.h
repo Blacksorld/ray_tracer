@@ -12,6 +12,8 @@ public:
 
     ray(const ray& obj);
 
+    ray mirror(const vector3d& point, const vector3d& normal) const;
+
     friend class ray_tracer;
     friend class object;
     friend class sphere;
