@@ -19,7 +19,7 @@
 class rt_parser {
 public:
     rt_parser(const std::string& file_name, unsigned int axis1_resolution = 800,
-              unsigned int axis2_resolution = 800, unsigned int antialiasing_coefficient = 4);
+              unsigned int axis2_resolution = 800, unsigned int antialiasing_coefficient = 8);
 
     virtual ~rt_parser();
 

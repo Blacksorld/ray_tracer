@@ -76,7 +76,7 @@ object* ray_tracer::trace_(const ray& ray, vector3d* const point) const {
 
 sf::Color ray_tracer::get_screen_color_(const vector3d& screen_point) const {
     ray ray(screen_point, screen_point - observer_);
-    return get_color_(ray, 4);
+    return get_color_(ray, 3);
 }
 
 sf::Color ray_tracer::get_color_(const ray& cur_ray, unsigned int depth) const {
@@ -99,7 +99,7 @@ sf::Color ray_tracer::get_color_(const ray& cur_ray, unsigned int depth) const {
     }
 
     sf::Color base = prod_(object_ptr->get_color(), intensity);
-    sf::Color refraction = sf::Color();
+    sf::Color refraction;
     if (object_ptr->getAlpha() != 1) {
         double cos_phi = scalar_product(cur_ray.direction_, normal);
         double k; // outside / inside
